@@ -1,5 +1,10 @@
 body {
-    background: gray;
+    margin: 0;
+    padding: 0;
+}
+
+.display-none {
+    display: none;
 }
 
 .ya-map-container {
@@ -10,9 +15,7 @@ body {
 /*review template*/
 .review-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 342px;
+    width: 344px;
     height: 332px;
     background-repeat: no-repeat;
     background-position: center center;
@@ -213,27 +216,29 @@ body {
     position: absolute;
     top: 22px;
     left: 17px;
+    width: 310px;
+    text-align: center;
     font-family: Arial;
     font-weight: Bold;
     font-size: 20px;
     opacity: 1;
-    text-align: left;
 }
 .review-close {
     width: 15px;
     height: 14px;
     opacity: 1;
     position: absolute;
-    top: 0;
-    left: 322px;
+    top: -2px;
+    left: 328px;
 }
 .review-close::before {
     content: 'x';
     font-weight: 700;
-    font-size: 18px;
+    font-size: 20px;
     font-family: sans-serif;
     cursor: pointer;
     color: gray;
+    position: fixed;
 }
 .review-close:hover::before {
     color: black;
