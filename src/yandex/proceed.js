@@ -11,6 +11,13 @@ const MapConfig = {
     center: [35.65858, 139.74544],
     zoom: 10,
 }
+const reviewData = {
+    placeX: '',
+    placeY: '',
+    name: '',
+    place: '',
+    feedback: '',
+}
 
 const createMapContainer = () => {
     const mapContainer = document.createElement('div');
@@ -34,16 +41,37 @@ const reviewContainerCloseButton = document.querySelector(`.${CLOSE_BUTTON_CLASS
 
 const isEscapeKey = (ev) => ev.key === 'Escape';
 const emptyReviewForm = () => {
-    [...reviewForm.elements].forEach((formElement) => {
-        formElement.value = '';
-    });
-}
 
-const showReviewContainer = (x, y) => {
     reviewContainer.style.removeProperty('top');
     reviewContainer.style.removeProperty('bottom');
     reviewContainer.style.removeProperty('left');
     reviewContainer.style.removeProperty('right');
+
+    [...reviewForm.elements].forEach((formElement) => {
+        formElement.value = '';
+    });
+
+    /*empty review data*/
+    recordReviewData();
+
+    /*remove events from reviewFormFields*/
+    reviewForm.elements['name'].removeEventListener('input', reviewFormElementsInputEventHandler);
+    reviewForm.elements['place'].removeEventListener('input', reviewFormElementsInputEventHandler);
+    reviewForm.elements['feedback'].removeEventListener('input', reviewFormElementsInputEventHandler);
+}
+const recordReviewData = (input = false) => {
+    if (!input) {
+        reviewData.placeX = '';
+        reviewData.placeY = '';
+        reviewData.name = '';
+        reviewData.place = '';
+        reviewData.feedback = '';
+    } else {
+        reviewData[input.name] = input.value;
+    }
+}
+
+const showReviewContainer = (x, y) => {
 
     const xPosition = window.innerWidth / 2 > x ? LEFT : RIGHT;
     const yPosition = window.innerHeight / 2 > y ? TOP : BOTTOM;
@@ -57,6 +85,15 @@ const showReviewContainer = (x, y) => {
 
     document.addEventListener('keydown', documentKeydownHandler);
     reviewContainerCloseButton.addEventListener('click', reviewContainerCloseButtonClickHandler);
+
+    /*record place position*/
+    reviewData.placeX = x;
+    reviewData.placeY = y;
+
+    /*add events to reviewFormFields*/
+    reviewForm.elements['name'].addEventListener('input', reviewFormElementsInputEventHandler);
+    reviewForm.elements['place'].addEventListener('input', reviewFormElementsInputEventHandler);
+    reviewForm.elements['feedback'].addEventListener('input', reviewFormElementsInputEventHandler);
 }
 const hideReviewContainer = () => {
     emptyReviewForm();
@@ -69,6 +106,9 @@ const hideReviewContainer = () => {
 const mapContainerClickHandler = (ev) => {
     hideReviewContainer();
     showReviewContainer(ev.clientX, ev.clientY);
+}
+const reviewFormElementsInputEventHandler = (ev) => {
+    recordReviewData(ev.currentTarget);
 }
 const reviewContainerCloseButtonClickHandler = () => {
     hideReviewContainer();
