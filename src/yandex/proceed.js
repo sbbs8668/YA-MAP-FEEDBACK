@@ -1,5 +1,10 @@
+/*require("html-loader!../src/templates/review-container.html");*/
+import reviewHTML from '../templates/review-container.html';
+const reviewContainer = document.createElement('div');
+reviewContainer.innerHTML = reviewHTML;
+
 const MapConfig = {
-    center: [55, 37],
+    center: [35.65858, 139.74544],
     zoom: 10,
 }
 const createMapContainer = () => {
@@ -11,9 +16,11 @@ const createMapContainer = () => {
 
 const proceedYandex = (ymaps) => {
     const mapContainer = createMapContainer();
-    ymaps.ready(() => {
-        const yaMap = new ymaps.Map(mapContainer, MapConfig);
-    })
+    if (ymaps) {
+        ymaps.ready(() => {
+            const yaMap = new ymaps.Map(mapContainer, MapConfig);
+        })
+    }
 }
 
 export {proceedYandex};
