@@ -46,6 +46,10 @@ body {
     font-family: sans-serif;
 }
 
+.input-error {
+    border: 1px solid red;
+}
+
 .v2_29 {
     width: 353px;
     height: 351px;

@@ -7,6 +7,7 @@ const TOP = 'top';
 const BOTTOM = 'bottom';
 const REVIEW_FORM_CLASS = 'review-form';
 const CLOSE_BUTTON_CLASS = 'review-close';
+const SUBMIT_BUTTON_CLASS = 'review-submit';
 const MapConfig = {
     center: [35.65858, 139.74544],
     zoom: 10,
@@ -38,9 +39,13 @@ const createReviewContainer = () => {
 const reviewContainer = createReviewContainer();
 const reviewForm = document.querySelector(`.${REVIEW_FORM_CLASS}`);
 const reviewContainerCloseButton = document.querySelector(`.${CLOSE_BUTTON_CLASS}`);
+const reviewContainerSubmitButton = document.querySelector(`.${SUBMIT_BUTTON_CLASS}`);
 
 const isEscapeKey = (ev) => ev.key === 'Escape';
+
 const emptyReviewForm = () => {
+
+    reviewContainer.classList.add('display-none');
 
     reviewContainer.style.removeProperty('top');
     reviewContainer.style.removeProperty('bottom');
@@ -49,15 +54,16 @@ const emptyReviewForm = () => {
 
     [...reviewForm.elements].forEach((formElement) => {
         formElement.value = '';
+        formElement.removeEventListener('input', reviewFormElementsInputEventHandler);
+        /*remove error class if left after empty value validation*/
+        formElement.classList.remove('input-error');
     });
+
+    reviewContainerCloseButton.removeEventListener('click', reviewContainerCloseButtonClickHandler);
+    reviewContainerSubmitButton.removeEventListener('click', reviewContainerSubmitButtonClickEventHandler);
 
     /*empty review data*/
     recordReviewData();
-
-    /*remove events from reviewFormFields*/
-    reviewForm.elements['name'].removeEventListener('input', reviewFormElementsInputEventHandler);
-    reviewForm.elements['place'].removeEventListener('input', reviewFormElementsInputEventHandler);
-    reviewForm.elements['feedback'].removeEventListener('input', reviewFormElementsInputEventHandler);
 }
 const recordReviewData = (input = false) => {
     if (!input) {
@@ -67,7 +73,26 @@ const recordReviewData = (input = false) => {
         reviewData.place = '';
         reviewData.feedback = '';
     } else {
+        /*remove error class if left after empty value validation*/
+        input.classList.remove('input-error');
         reviewData[input.name] = input.value;
+    }
+}
+const proceedReview = () => {
+    /*validate review data*/
+    const emptyFields = [];
+    for (const reviewFieldName in reviewData) {
+        if (!reviewData[reviewFieldName]) {
+            emptyFields.push(reviewFieldName);
+        }
+    }
+    if (emptyFields.length) {
+        emptyFields.forEach((emptyFieldName) => {
+            reviewForm.elements[emptyFieldName].classList.add('input-error');
+        });
+    } else {
+        console.log(reviewData);
+        /*send the review data to server*/
     }
 }
 
@@ -94,13 +119,13 @@ const showReviewContainer = (x, y) => {
     reviewForm.elements['name'].addEventListener('input', reviewFormElementsInputEventHandler);
     reviewForm.elements['place'].addEventListener('input', reviewFormElementsInputEventHandler);
     reviewForm.elements['feedback'].addEventListener('input', reviewFormElementsInputEventHandler);
+
+    reviewContainerSubmitButton.addEventListener('click', reviewContainerSubmitButtonClickEventHandler);
 }
 const hideReviewContainer = () => {
     emptyReviewForm();
-    reviewContainer.classList.add('display-none');
     mapContainer.addEventListener('click', mapContainerClickHandler);
     document.removeEventListener('keydown', documentKeydownHandler);
-    reviewContainerCloseButton.removeEventListener('click', reviewContainerCloseButtonClickHandler);
 }
 
 const mapContainerClickHandler = (ev) => {
@@ -112,6 +137,9 @@ const reviewFormElementsInputEventHandler = (ev) => {
 }
 const reviewContainerCloseButtonClickHandler = () => {
     hideReviewContainer();
+}
+const reviewContainerSubmitButtonClickEventHandler = () => {
+    proceedReview();
 }
 const documentKeydownHandler = (ev) => {
     if(isEscapeKey(ev)) {
