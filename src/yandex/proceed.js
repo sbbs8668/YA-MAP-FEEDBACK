@@ -1,4 +1,3 @@
-/*require("html-loader!../src/templates/review-container.html");*/
 import reviewHTML from '../templates/review-container.html';
 
 const LEFT = 'left';

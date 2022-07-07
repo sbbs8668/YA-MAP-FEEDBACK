@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack --progress --colors --mode production",
+    "watch": "webpack serve --progress --open --mode development",
+    "start": "yarn watch"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +18,8 @@
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.6.1",
     "webpack": "^5.73.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
     "yandex": "^1.1.0"
