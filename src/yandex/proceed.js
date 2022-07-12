@@ -80,8 +80,25 @@ const proceedReview = () => {
             }
         });
     } else {
-        console.log(reviewData);
+        const placeX = reviewData.placeX;
+        const placeY = reviewData.placeY;
+        const name = reviewData.name;
+        const place = reviewData.place;
+        const feedback = reviewData.feedback;
+        const newReviewData = JSON.parse(localStorage.getItem('reviewData')) || [];
+        newReviewData.push({
+            placeX,
+            placeY,
+            name,
+            place,
+            feedback,
+        });
+
         /*send the review data to server*/
+        localStorage.setItem('reviewData',
+            JSON.stringify(newReviewData)
+        );
+        console.log(JSON.parse(localStorage.getItem('reviewData')));
     }
 }
 
@@ -103,8 +120,8 @@ const showReviewContainer = (x, y) => {
     const yPosition = window.innerHeight / 2 > y ? TOP : BOTTOM;
 
     /*move away from the placemark*/
-    xPosition === RIGHT ?  x -= 10 : x += 10;
-    yPosition === BOTTOM ?  y -= 5 : y += 10;
+    xPosition === RIGHT ?  x -= 8 : x += 8;
+    yPosition === BOTTOM ?  y -= 8 : y += 8;
 
     const xPositionValue = xPosition === RIGHT ? `${window.innerWidth - x}px` : `${x}px`;
     const yPositionValue = yPosition === BOTTOM ? `${window.innerHeight - y}px` : `${y}px`;

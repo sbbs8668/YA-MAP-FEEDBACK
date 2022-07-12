@@ -23,7 +23,6 @@ body {
     background-size: cover;
     opacity: 1;
     overflow: hidden;
-    border-radius: 6px;
 }
 .review-label {
     display: flex;
