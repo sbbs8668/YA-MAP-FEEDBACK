@@ -1,7 +1,8 @@
 /*const YA_API_URL = 'https://api-maps.yandex.ru/2.1/?lang=en_US';*/
 
 import ymaps from 'ya';
-import {mapContainerClickHandler} from './proceed.js';
+import { mapContainerClickHandler } from './proceed.js';
+import { setMap } from './proceed.js';
 
 const mapConfig = {
     center: [35.65858, 139.74544],
@@ -16,7 +17,8 @@ const createMapContainer = () => {
 }
 const loadYandex = () => {
     ymaps.ready(() => {
-        new ymaps.Map(createMapContainer(), mapConfig);
+        const map = new ymaps.Map(createMapContainer(), mapConfig);
+        setMap(map, ymaps);
     })
 }
 

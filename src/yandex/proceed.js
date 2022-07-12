@@ -13,6 +13,8 @@ const reviewData = {
     name: '',
     place: '',
     feedback: '',
+    map: '',
+    ymaps: '',
 }
 
 const createReviewContainer = () => {
@@ -54,8 +56,6 @@ const emptyReviewForm = () => {
 }
 const recordReviewData = (input = false) => {
     if (!input) {
-        reviewData.placeX = '';
-        reviewData.placeY = '';
         reviewData.name = '';
         reviewData.place = '';
         reviewData.feedback = '';
@@ -75,7 +75,9 @@ const proceedReview = () => {
     }
     if (emptyFields.length) {
         emptyFields.forEach((emptyFieldName) => {
-            reviewForm.elements[emptyFieldName].classList.add('input-error');
+            if (reviewForm.elements[emptyFieldName]) {
+                reviewForm.elements[emptyFieldName].classList.add('input-error');
+            }
         });
     } else {
         console.log(reviewData);
@@ -83,10 +85,27 @@ const proceedReview = () => {
     }
 }
 
+const recordMapCoordinates = (coords) => {
+    reviewData.placeX = coords[0];
+    reviewData.placeY = coords[1];
+}
+const hidePlaceMark = () => {
+    reviewData.map.geoObjects.removeAll();
+}
+const showPlaceMark = () => {
+    hidePlaceMark();
+    const placeMark = new reviewData.ymaps.Placemark([reviewData.placeX, reviewData.placeY], null, {preset: 'islands#darkGreenCircleDotIcon'});
+    reviewData.map.geoObjects.add(placeMark);
+}
 const showReviewContainer = (x, y) => {
 
     const xPosition = window.innerWidth / 2 > x ? LEFT : RIGHT;
     const yPosition = window.innerHeight / 2 > y ? TOP : BOTTOM;
+
+    /*move away from the placemark*/
+    xPosition === RIGHT ?  x -= 10 : x += 10;
+    yPosition === BOTTOM ?  y -= 5 : y += 10;
+
     const xPositionValue = xPosition === RIGHT ? `${window.innerWidth - x}px` : `${x}px`;
     const yPositionValue = yPosition === BOTTOM ? `${window.innerHeight - y}px` : `${y}px`;
 
@@ -98,10 +117,6 @@ const showReviewContainer = (x, y) => {
     document.addEventListener('keydown', documentKeydownHandler);
     reviewContainerCloseButton.addEventListener('click', reviewContainerCloseButtonClickHandler);
 
-    /*record place position*/
-    reviewData.placeX = x;
-    reviewData.placeY = y;
-
     /*add events to reviewFormFields*/
     reviewForm.elements['name'].addEventListener('input', reviewFormElementsInputEventHandler);
     reviewForm.elements['place'].addEventListener('input', reviewFormElementsInputEventHandler);
@@ -111,7 +126,6 @@ const showReviewContainer = (x, y) => {
 }
 const hideReviewContainer = () => {
     emptyReviewForm();
-    /*mapContainer.addEventListener('click', mapContainerClickHandler);*/
     document.removeEventListener('keydown', documentKeydownHandler);
 }
 
@@ -119,6 +133,7 @@ const reviewFormElementsInputEventHandler = (ev) => {
     recordReviewData(ev.currentTarget);
 }
 const reviewContainerCloseButtonClickHandler = () => {
+    hidePlaceMark();
     hideReviewContainer();
 }
 const reviewContainerSubmitButtonClickEventHandler = () => {
@@ -126,6 +141,7 @@ const reviewContainerSubmitButtonClickEventHandler = () => {
 }
 const documentKeydownHandler = (ev) => {
     if(isEscapeKey(ev)) {
+        hidePlaceMark();
         hideReviewContainer();
     }
 }
@@ -135,4 +151,15 @@ const mapContainerClickHandler = (ev) => {
     showReviewContainer(ev.clientX, ev.clientY);
 }
 
+const setMap = (map, ymaps) => {
+    reviewData.map = map;
+    reviewData.ymaps = ymaps;
+    reviewData.map.events.add('click', (ev) => {
+        recordMapCoordinates(ev.get('coords'));
+        showPlaceMark();
+    });
+}
+
 export { mapContainerClickHandler };
+export { setMap };
+
