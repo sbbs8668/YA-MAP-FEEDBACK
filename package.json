@@ -4,9 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --progress --colors --mode production",
-    "watch": "webpack serve --progress --open --mode development",
-    "start": "yarn watch"
+    "serve": "webpack serve --progress"
   },
   "keywords": [],
   "author": "",

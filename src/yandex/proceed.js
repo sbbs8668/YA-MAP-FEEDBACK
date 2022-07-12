@@ -7,10 +7,6 @@ const BOTTOM = 'bottom';
 const REVIEW_FORM_CLASS = 'review-form';
 const CLOSE_BUTTON_CLASS = 'review-close';
 const SUBMIT_BUTTON_CLASS = 'review-submit';
-const MapConfig = {
-    center: [35.65858, 139.74544],
-    zoom: 10,
-}
 const reviewData = {
     placeX: '',
     placeY: '',
@@ -18,14 +14,6 @@ const reviewData = {
     place: '',
     feedback: '',
 }
-
-const createMapContainer = () => {
-    const mapContainer = document.createElement('div');
-    mapContainer.classList.add('ya-map-container');
-    document.body.append(mapContainer);
-    return mapContainer;
-}
-const mapContainer = createMapContainer();
 
 const createReviewContainer = () => {
     const reviewContainer = document.createElement('div');
@@ -123,14 +111,10 @@ const showReviewContainer = (x, y) => {
 }
 const hideReviewContainer = () => {
     emptyReviewForm();
-    mapContainer.addEventListener('click', mapContainerClickHandler);
+    /*mapContainer.addEventListener('click', mapContainerClickHandler);*/
     document.removeEventListener('keydown', documentKeydownHandler);
 }
 
-const mapContainerClickHandler = (ev) => {
-    hideReviewContainer();
-    showReviewContainer(ev.clientX, ev.clientY);
-}
 const reviewFormElementsInputEventHandler = (ev) => {
     recordReviewData(ev.currentTarget);
 }
@@ -146,13 +130,9 @@ const documentKeydownHandler = (ev) => {
     }
 }
 
-const proceedYandex = (ymaps) => {
-    if (ymaps) {
-        ymaps.ready(() => {
-            const yaMap = new ymaps.Map(mapContainer, MapConfig);
-            mapContainer.addEventListener('click', mapContainerClickHandler);
-        })
-    }
+const mapContainerClickHandler = (ev) => {
+    hideReviewContainer();
+    showReviewContainer(ev.clientX, ev.clientY);
 }
 
-export {proceedYandex};
+export { mapContainerClickHandler };

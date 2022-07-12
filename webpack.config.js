@@ -4,7 +4,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
-    mode: 'development',
+    externalsType: 'script',
+    externals: {
+        ya: [
+            'https://api-maps.yandex.ru/2.1/?lang=en_US',
+            'ymaps',
+        ]
+    },
+    mode: 'production',
     entry: './src/index.js',
     module: {
         rules: [
@@ -26,6 +33,13 @@ module.exports = {
     devServer: {
         index: 'index.html',
         overlay: true,
+        contentBase: path.join(__dirname, "dist"),
+        port: 8080,
+        hot: true,
+        watchContentBase: true,
+        watchOptions: {
+            poll: true
+        },
     },
     devtool: 'source-map',
     plugins: [
@@ -37,5 +51,6 @@ module.exports = {
             cleanAfterEveryBuildPatterns: ['dist']
         })
     ],
+    watch: true,
 };
 
