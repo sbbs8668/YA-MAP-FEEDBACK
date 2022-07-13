@@ -11,6 +11,8 @@ const BOTTOM = 'bottom';
 const REVIEW_FORM_CLASS = 'review-form';
 const CLOSE_BUTTON_CLASS = 'review-close';
 const SUBMIT_BUTTON_CLASS = 'review-submit';
+const DISPLAY_NONE_CLASS = 'display-none';
+const OLD_REVIEWS_CONTAINER_CLASS = 'old-reviews-container';
 
 const reviewData = {
     placeX: '',
@@ -26,11 +28,17 @@ const createReviewContainer = () => {
     const reviewContainer = document.createElement('div');
     reviewContainer.innerHTML = reviewHTML;
     reviewContainer.classList.add('review-container');
-    reviewContainer.classList.add('display-none');
+    reviewContainer.classList.add(DISPLAY_NONE_CLASS);
     document.body.append(reviewContainer);
     return reviewContainer;
 }
-const newReview = createReviewContainer();
+const reviewContainer = createReviewContainer();
+const oldReviewsContainer = reviewContainer.querySelector(`.${OLD_REVIEWS_CONTAINER_CLASS}`);
+
+const getReviewContainer = () => {
+    return reviewContainer;
+}
+
 const reviewForm = document.querySelector(`.${REVIEW_FORM_CLASS}`);
 const reviewContainerCloseButton = document.querySelector(`.${CLOSE_BUTTON_CLASS}`);
 const reviewContainerSubmitButton = document.querySelector(`.${SUBMIT_BUTTON_CLASS}`);
@@ -55,6 +63,7 @@ const proceedReview = () => {
         const name = reviewData.name;
         const place = reviewData.place;
         const feedback = reviewData.feedback;
+        const timestamp = Math.floor(Date.now() / 1000);
         const newReviewData = JSON.parse(localStorage.getItem('reviewData')) || [];
         newReviewData.push({
             placeX,
@@ -62,6 +71,7 @@ const proceedReview = () => {
             name,
             place,
             feedback,
+            timestamp
         });
 
         /*send the review data to server*/
@@ -84,10 +94,10 @@ const recordReviewData = (input) => {
 }
 
 const emptyReviewForm = () => {
-    newReview.style.removeProperty('top');
-    newReview.style.removeProperty('bottom');
-    newReview.style.removeProperty('left');
-    newReview.style.removeProperty('right');
+    reviewContainer.style.removeProperty('top');
+    reviewContainer.style.removeProperty('bottom');
+    reviewContainer.style.removeProperty('left');
+    reviewContainer.style.removeProperty('right');
     [...reviewForm.elements].forEach((formElement) => {
         formElement.value = '';
         formElement.removeEventListener('input', reviewFormElementsInputEventHandler);
@@ -98,8 +108,12 @@ const emptyReviewForm = () => {
     reviewContainerSubmitButton.removeEventListener('click', reviewContainerSubmitButtonClickEventHandler);
     emptyReviewData();
 }
+const hideOldReviewContainer = () => {
+    oldReviewsContainer.parentNode.classList.add(DISPLAY_NONE_CLASS);
+    oldReviewsContainer.innerHTML = '';
+}
 const hideReviewContainer = () => {
-    newReview.classList.add('display-none');
+    reviewContainer.classList.add(DISPLAY_NONE_CLASS);
     emptyReviewForm();
     document.removeEventListener('keydown', documentKeydownHandler);
 }
@@ -115,8 +129,8 @@ const showReviewContainer = (x, y) => {
     const xPositionValue = xPosition === RIGHT ? `${window.innerWidth - x}px` : `${x}px`;
     const yPositionValue = yPosition === BOTTOM ? `${window.innerHeight - y}px` : `${y}px`;
 
-    newReview.style.setProperty(xPosition, xPositionValue);
-    newReview.style.setProperty(yPosition, yPositionValue);
+    reviewContainer.style.setProperty(xPosition, xPositionValue);
+    reviewContainer.style.setProperty(yPosition, yPositionValue);
 
     document.addEventListener('keydown', documentKeydownHandler);
     reviewContainerCloseButton.addEventListener('click', reviewContainerCloseButtonClickHandler);
@@ -128,7 +142,7 @@ const showReviewContainer = (x, y) => {
 
     reviewContainerSubmitButton.addEventListener('click', reviewContainerSubmitButtonClickEventHandler);
 
-    newReview.classList.remove('display-none');
+    reviewContainer.classList.remove(DISPLAY_NONE_CLASS);
 }
 
 const recordMapCoordinates = (coords) => {
@@ -144,6 +158,7 @@ const documentKeydownHandler = (ev) => {
 }
 
 const mapContainerClickEventHandler = (ev) => {
+    hideOldReviewContainer();
     hideReviewContainer();
     showReviewContainer(ev.clientX, ev.clientY);
     showPlaceMark(reviewData.placeX, reviewData.placeY);
@@ -169,4 +184,4 @@ const mapContainer = createMapContainer();
 mapContainer.addEventListener('click', mapContainerClickEventHandler);
 
 export { recordMapCoordinates };
-export { hideReviewContainer };
+export { showReviewContainer, hideReviewContainer, getReviewContainer};

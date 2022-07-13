@@ -1,8 +1,11 @@
 import { recordMapCoordinates } from './new-review.js';
-import { hideReviewContainer } from './new-review.js';
+import { showReviewContainer, hideReviewContainer, getReviewContainer } from './new-review.js';
 
 const MAX_ZOOM = 21;
 const CLUSTER_SIZE = 256;
+const OLD_REVIEWS_CONTAINER_CLASS = 'old-reviews-container';
+const DISPLAY_NONE_CLASS = 'display-none';
+
 const appData = {
     map: '',
     ymaps: '',
@@ -10,6 +13,7 @@ const appData = {
     feedbackedPlaceMarks: [],
     previousReviews: [],
     objectManager: '',
+    oldReviews: [],
 }
 
 const hidePlaceMark = () => {
@@ -25,19 +29,87 @@ const showPlaceMark = (x, y) => {
     appData.placeMarks.push(placeMark);
 }
 
+const getOldReviewTemplate = () => {
+    const div = document.createElement('div');
+    const span = document.createElement('span');
+    const timestampDiv = div.cloneNode();
+    timestampDiv.classList.add('old-timestamp-place-div');
+    const namePlaceDiv = div.cloneNode();
+    namePlaceDiv.classList.add('old-name-place-div');
+    const nameSpan = span.cloneNode();
+    nameSpan.classList.add('old-name-span');
+    const placeSpan = span.cloneNode();
+    placeSpan.classList.add('old-place-span');
+    const feedbackDiv = div.cloneNode();
+    feedbackDiv.classList.add('old-feedback-div');
+    const oldReview = div.cloneNode();
+    return { nameSpan, placeSpan, namePlaceDiv, timestampDiv, feedbackDiv, oldReview};
+}
+const emptyOldReviewsContainer = () => {
+    const reviewsContainer = getReviewContainer();
+    const oldReviewsContainer = reviewsContainer.querySelector(`.${OLD_REVIEWS_CONTAINER_CLASS}`)
+    oldReviewsContainer.innerHTML = '';
+    return oldReviewsContainer;
+}
+const getOldReviewsContainer = () => emptyOldReviewsContainer();
+const fillReviewsContainer = () => {
+    const oldReviewsContainer = getOldReviewsContainer();
+    const oldReviewTemplate = getOldReviewTemplate();
+    appData.oldReviews.sort((a, b) => {
+        a.timestamp = a.timestamp || 0;
+        b.timestamp = b.timestamp || 0;
+        return b.timestamp - a.timestamp;
+    });
+    appData.oldReviews.forEach((oldReview) => {
+        const nameNode = oldReviewTemplate.nameSpan.cloneNode();
+        nameNode.textContent = oldReview.name;
+        const placeNode = oldReviewTemplate.placeSpan.cloneNode();
+        placeNode.textContent = oldReview.place;
+        const timestampDivNode = oldReviewTemplate.timestampDiv.cloneNode();
+        if (oldReview.timestamp) {
+            timestampDivNode.textContent = new Date(oldReview.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ');
+        }
+        const feedbackNode = oldReviewTemplate.feedbackDiv.cloneNode();
+        feedbackNode.textContent = oldReview.feedback;
+
+        const namePlaceDivNode = oldReviewTemplate.namePlaceDiv.cloneNode();
+        namePlaceDivNode.append(nameNode);
+        namePlaceDivNode.append(placeNode);
+        const oldReviewNode = oldReviewTemplate.oldReview.cloneNode();
+        oldReviewNode.append(namePlaceDivNode);
+        oldReviewNode.append(timestampDivNode);
+        oldReviewNode.append(feedbackNode);
+        oldReviewsContainer.append(oldReviewNode);
+    });
+    oldReviewsContainer.parentNode.classList.remove(DISPLAY_NONE_CLASS);
+    setTimeout(()=>{
+        showReviewContainer();
+    }, 1);
+}
+
 const reviewPlaceMarkClickHandler = (ev) => {
     setTimeout(() => {
         hideReviewContainer();
         hidePlaceMark();
     });
-    console.log(appData.objectManager.objects.getById(ev.get('objectId')).content);
 }
 const reviewClusterClickHandler = (ev) => {
-    setTimeout(() => {
-        hideReviewContainer();
-        hidePlaceMark();
-    });
-    console.log(appData.objectManager.clusters.getById(ev.get('objectId')).features);
+    recordMapCoordinates(ev.get('coords'));
+    if (appData.map.getZoom() === MAX_ZOOM) {
+        appData.oldReviews = [];
+        [...appData.objectManager.clusters.getById(ev.get('objectId')).features].forEach((feature) => {
+            appData.oldReviews.push(feature.content);
+        });
+        setTimeout(()=>{
+            fillReviewsContainer();
+        })
+    } else {
+        setTimeout(() => {
+            hideReviewContainer();
+            hidePlaceMark();
+
+        });
+    }
 }
 
 const initCluster = () => {
@@ -86,6 +158,7 @@ const showFeedbackedPlaceMarks = () => {
                 feedback: previousReview.feedback,
                 name: previousReview.name,
                 place: previousReview.place,
+                timestamp: previousReview.timestamp,
             }
         }
         appData.feedbackedPlaceMarks.push(feedbackedPlaceMark);
