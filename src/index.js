@@ -1,5 +1,4 @@
 import "./css.css";
-
-import {loadYandex} from './yandex/load.js';
+import { loadYandex } from './yandex/load.js';
 
 loadYandex();
