@@ -25,6 +25,9 @@ const hidePlaceMark = () => {
 const showPlaceMark = (x, y) => {
     hidePlaceMark();
     const placeMark = new appData.ymaps.Placemark([x, y], null, {preset: 'islands#darkGreenCircleDotIcon'});
+    placeMark.events.add("click", function(){
+        appData.map.setZoom(appData.map.getZoom() + 2);
+    });
     appData.map.geoObjects.add(placeMark);
     appData.placeMarks.push(placeMark);
 }
@@ -88,10 +91,21 @@ const fillReviewsContainer = () => {
 }
 
 const reviewPlaceMarkClickHandler = (ev) => {
-    setTimeout(() => {
-        hideReviewContainer();
-        hidePlaceMark();
-    });
+    if (appData.map.getZoom() < MAX_ZOOM / 1.4) {
+        setTimeout(() => {
+            hideReviewContainer();
+            hidePlaceMark();
+            appData.map.setCenter(ev.get('coords'));
+            appData.map.setZoom(appData.map.getZoom() + 4);
+        });
+    } else {
+        recordMapCoordinates(ev.get('coords'));
+        appData.oldReviews = [];
+        appData.oldReviews.push(appData.objectManager.objects.getById(ev.get('objectId')).content);
+        setTimeout(()=>{
+            fillReviewsContainer();
+        });
+    }
 }
 const reviewClusterClickHandler = (ev) => {
     recordMapCoordinates(ev.get('coords'));
