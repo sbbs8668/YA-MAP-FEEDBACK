@@ -15,6 +15,9 @@ const reviewData = {
     feedback: '',
     map: '',
     ymaps: '',
+    placeMarks: [],
+    feedbackedPlaceMarks: [],
+    clusterer: '',
 }
 
 const createReviewContainer = () => {
@@ -33,7 +36,6 @@ const reviewContainerSubmitButton = document.querySelector(`.${SUBMIT_BUTTON_CLA
 const isEscapeKey = (ev) => ev.key === 'Escape';
 
 const emptyReviewForm = () => {
-
     reviewContainer.classList.add('display-none');
 
     reviewContainer.style.removeProperty('top');
@@ -53,6 +55,10 @@ const emptyReviewForm = () => {
 
     /*empty review data*/
     recordReviewData();
+}
+const recordMapCoordinates = (coords) => {
+    reviewData.placeX = coords[0];
+    reviewData.placeY = coords[1];
 }
 const recordReviewData = (input = false) => {
     if (!input) {
@@ -95,25 +101,13 @@ const proceedReview = () => {
         });
 
         /*send the review data to server*/
-        localStorage.setItem('reviewData',
-            JSON.stringify(newReviewData)
-        );
-        console.log(JSON.parse(localStorage.getItem('reviewData')));
+        localStorage.setItem('reviewData', JSON.stringify(newReviewData));
+        hidePlaceMark();
+        hideReviewContainer();
+        showFeedbackedPlaceMarks();
     }
 }
 
-const recordMapCoordinates = (coords) => {
-    reviewData.placeX = coords[0];
-    reviewData.placeY = coords[1];
-}
-const hidePlaceMark = () => {
-    reviewData.map.geoObjects.removeAll();
-}
-const showPlaceMark = () => {
-    hidePlaceMark();
-    const placeMark = new reviewData.ymaps.Placemark([reviewData.placeX, reviewData.placeY], null, {preset: 'islands#darkGreenCircleDotIcon'});
-    reviewData.map.geoObjects.add(placeMark);
-}
 const showReviewContainer = (x, y) => {
 
     const xPosition = window.innerWidth / 2 > x ? LEFT : RIGHT;
@@ -146,6 +140,60 @@ const hideReviewContainer = () => {
     document.removeEventListener('keydown', documentKeydownHandler);
 }
 
+const showPlaceMark = () => {
+    hidePlaceMark();
+    const placeMark = new reviewData.ymaps.Placemark([reviewData.placeX, reviewData.placeY], null, {preset: 'islands#darkGreenCircleDotIcon'});
+    reviewData.map.geoObjects.add(placeMark);
+    reviewData.placeMarks.push(placeMark);
+}
+const hidePlaceMark = () => {
+    reviewData.placeMarks.forEach((placeMark) => {
+        reviewData.map.geoObjects.remove(placeMark);
+    })
+}
+
+const showClaster = () => {
+    setTimeout(() => {
+        hideReviewContainer();
+    })
+}
+const removeFeedbackedPlaceMarks = () => {
+    reviewData.feedbackedPlaceMarks.forEach((feedbackedPlaceMark) => {
+        reviewData.map.geoObjects.remove(feedbackedPlaceMark);
+    });
+    if (reviewData.clusterer) {
+        reviewData.clusterer.removeAll();
+    }
+}
+const showFeedbackedPlaceMarks = () => {
+    removeFeedbackedPlaceMarks();
+    reviewData.feedbackedPlaceMarks = [];
+    const feedbackedPlaceMarks = JSON.parse(localStorage.getItem('reviewData')) || [];
+    feedbackedPlaceMarks.forEach((feedbackedPlaceMark) => {
+        feedbackedPlaceMark = new ymaps.Placemark([feedbackedPlaceMark.placeX, feedbackedPlaceMark.placeY],
+            {
+                hasBalloon: false,
+                openBalloonOnClick: false,
+                balloonContent: '',
+            }, {
+            preset: 'islands#redCircleDotIcon',
+        });
+        reviewData.map.geoObjects.add(feedbackedPlaceMark);
+        reviewData.feedbackedPlaceMarks.push(feedbackedPlaceMark);
+    })
+    reviewData.clusterer = new reviewData.ymaps.Clusterer({
+            hasBalloon: false,
+            /*openBalloonOnClick: true,
+            balloonContent: '',*/
+    });
+    reviewData.clusterer.events.add('click', showClaster);
+    reviewData.map.geoObjects.add(reviewData.clusterer);
+    reviewData.clusterer.add(reviewData.feedbackedPlaceMarks);
+    reviewData.clusterer.options.set({
+        gridSize: 256
+    });
+}
+
 const reviewFormElementsInputEventHandler = (ev) => {
     recordReviewData(ev.currentTarget);
 }
@@ -175,6 +223,7 @@ const setMap = (map, ymaps) => {
         recordMapCoordinates(ev.get('coords'));
         showPlaceMark();
     });
+    showFeedbackedPlaceMarks();
 }
 
 export { mapContainerClickHandler };
