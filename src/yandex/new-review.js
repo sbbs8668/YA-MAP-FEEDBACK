@@ -13,6 +13,12 @@ const CLOSE_BUTTON_CLASS = 'review-close';
 const SUBMIT_BUTTON_CLASS = 'review-submit';
 const DISPLAY_NONE_CLASS = 'display-none';
 const OLD_REVIEWS_CONTAINER_CLASS = 'old-reviews-container';
+const REVIEW_CONFIRM_CLASS = 'reviews-confirm';
+const REVIEW_CONFIRM_TEXT = {
+    0: 'Your feedback has been successfully added!',
+    1: 'Let\'s review more places!',
+};
+const REVIEW_CONFIRM_SHOW_LENGTH = 5000;
 
 const reviewData = {
     placeX: '',
@@ -43,6 +49,20 @@ const reviewForm = document.querySelector(`.${REVIEW_FORM_CLASS}`);
 const reviewContainerCloseButton = document.querySelector(`.${CLOSE_BUTTON_CLASS}`);
 const reviewContainerSubmitButton = document.querySelector(`.${SUBMIT_BUTTON_CLASS}`);
 
+const showConfirmMessage = () => {
+    const div = document.createElement('div');
+    const text1 = div.cloneNode();
+    const text2 = div.cloneNode();
+    div.classList.add(REVIEW_CONFIRM_CLASS);
+    text1.textContent = REVIEW_CONFIRM_TEXT[0];
+    text2.textContent = REVIEW_CONFIRM_TEXT[1];
+    div.append(text1);
+    div.append(text2);
+    document.body.append(div);
+    setTimeout(() => {
+        div.remove();
+    }, REVIEW_CONFIRM_SHOW_LENGTH);
+}
 const proceedReview = () => {
     /*validate review data*/
     const emptyFields = [];
@@ -79,6 +99,7 @@ const proceedReview = () => {
         hidePlaceMark();
         hideReviewContainer();
         showFeedbackedPlaceMarks();
+        showConfirmMessage();
     }
 }
 

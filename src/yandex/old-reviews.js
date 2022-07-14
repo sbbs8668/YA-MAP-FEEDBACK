@@ -121,7 +121,6 @@ const reviewClusterClickHandler = (ev) => {
         setTimeout(() => {
             hideReviewContainer();
             hidePlaceMark();
-
         });
     }
 }

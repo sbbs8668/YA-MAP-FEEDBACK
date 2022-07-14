@@ -172,3 +172,23 @@ body {
 .display-none {
     display: none;
 }
+
+.reviews-confirm {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100px;
+    font-size: 34px;
+    font-family: Arial, sans-serif;
+    color: darkgreen;
+    font-weight: 700;
+    background-color: gold;
+    text-align: center;
+    padding: 10px;
+    box-sizing: border-box;
+}
