@@ -162,7 +162,8 @@ const showReviewContainer = (x, y) => {
     reviewForm.elements['feedback'].addEventListener('input', reviewFormElementsInputEventHandler);
 
     reviewContainerSubmitButton.addEventListener('click', reviewContainerSubmitButtonClickEventHandler);
-
+    console.log(DISPLAY_NONE_CLASS);
+    console.log(reviewContainer);
     reviewContainer.classList.remove(DISPLAY_NONE_CLASS);
 }
 
@@ -179,14 +180,24 @@ const documentKeydownHandler = (ev) => {
 }
 
 const mapContainerClickEventHandler = (ev) => {
+
     hideOldReviewContainer();
     hideReviewContainer();
-    showReviewContainer(ev.clientX, ev.clientY);
+    const x = ev.clientX;
+    const y = ev.clientY;
+    showReviewContainer(x, y);
     showPlaceMark(reviewData.placeX, reviewData.placeY);
 }
-const reviewContainerCloseButtonClickHandler = () => {
+const mapContainerDoubleClickEventHandler = () => {
     hidePlaceMark();
     hideReviewContainer();
+}
+
+const reviewContainerCloseButtonClickHandler = () => {
+    setTimeout(()=> {
+        hidePlaceMark();
+        hideReviewContainer();
+    }, 100)
 }
 const reviewFormElementsInputEventHandler = (ev) => {
     recordReviewData(ev.currentTarget);
@@ -195,14 +206,7 @@ const reviewContainerSubmitButtonClickEventHandler = () => {
     proceedReview();
 }
 
-const createMapContainer = () => {
-    const mapContainer = document.createElement('div');
-    mapContainer.classList.add('ya-map-container');
-    document.body.append(mapContainer);
-    return mapContainer;
-}
-const mapContainer = createMapContainer();
-mapContainer.addEventListener('click', mapContainerClickEventHandler);
-
 export { recordMapCoordinates };
+export { mapContainerClickEventHandler };
+export {mapContainerDoubleClickEventHandler};
 export { showReviewContainer, hideReviewContainer, getReviewContainer};

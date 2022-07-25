@@ -2,7 +2,7 @@ import { recordMapCoordinates } from './new-review.js';
 import { showReviewContainer, hideReviewContainer, getReviewContainer } from './new-review.js';
 
 const MAX_ZOOM = 21;
-const CLUSTER_SIZE = 256;
+const CLUSTER_SIZE = 512;
 const OLD_REVIEWS_CONTAINER_CLASS = 'old-reviews-container';
 const DISPLAY_NONE_CLASS = 'display-none';
 
