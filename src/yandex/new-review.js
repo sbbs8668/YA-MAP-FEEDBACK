@@ -162,8 +162,7 @@ const showReviewContainer = (x, y) => {
     reviewForm.elements['feedback'].addEventListener('input', reviewFormElementsInputEventHandler);
 
     reviewContainerSubmitButton.addEventListener('click', reviewContainerSubmitButtonClickEventHandler);
-    console.log(DISPLAY_NONE_CLASS);
-    console.log(reviewContainer);
+
     reviewContainer.classList.remove(DISPLAY_NONE_CLASS);
 }
 

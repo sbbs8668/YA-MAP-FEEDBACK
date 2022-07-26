@@ -55,7 +55,11 @@ const run =  (location) => {
   setMap(map, ymaps);
 
   mapContainer.addEventListener('click', mapContainerClickEventHandler);
-  mapContainer.addEventListener('dblclick', mapContainerDoubleClickEventHandler);
+  window.addEventListener('dblclick', () => {
+    setTimeout(()=> {
+      mapContainerDoubleClickEventHandler();
+    }, 10);
+  });
 
 }
 

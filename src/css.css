@@ -129,6 +129,10 @@ body {
     color: black;
 }
 
+.old-place-span {
+    cursor: pointer;
+    color: blue;
+}
 
 
 .v2_11 {
